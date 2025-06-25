@@ -1,0 +1,428 @@
+main {
+  margin-top: 0;
+}
+
+.inode-header {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2em 0;
+  gap: 1em;
+  align-items: center;
+  #file-preview-canvas + & {
+    padding-top: 1em;
+  }
+  > h1 {
+    margin: 0;
+    font-size: 1.2em;
+    #dir-page & {
+      display: unset !important;
+    }
+  }
+  > p {
+    margin: 0;
+  }
+  > .menubar {
+    margin-left: auto;
+  }
+}
+
+#create-dir-dialog {
+  output {
+    font-weight: bold;
+  }
+}
+
+#show-create-dir {
+  body:has(#inodes .create-box) & {
+    display: none;
+  }
+}
+
+/* fallback for popover "position-try-fallbacks" */
+html:not([data-browser-name="Chrome"]) {
+  #inode-page-settings {
+    margin-left: -40px;
+  }
+}
+
+html[data-browser-name="Safari"] {
+  .menubar .pop-menu {
+    margin-top: -1px;
+  }
+}
+
+/* =====================
+  Upload Inode
+===================== */
+
+#upload-dialog {
+  input {
+    width: 100%;
+  }
+  #upload-dialog-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  #upload-progress {
+    gap: 0.2em;
+    progress {
+      display: block;
+      width: 100%;
+    }
+    .info {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+  }
+}
+
+#upload-drop-overlay {
+  width: 100%;
+  height: 100%;
+  font-size: 1.8em;
+  background: rgba(0, 0, 0, 0.6);
+  border: 4px dashed white;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+  &:popover-open {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* =====================
+  Delete Inode
+===================== */
+
+#delete-inode-dilaog {
+  max-width: 32em;
+  .text-undone {
+    white-space: nowrap;
+  }
+}
+
+#bulk-delete-items-list {
+  min-width: 30em;
+  max-width: 50em;
+  margin-top: 1.5em;
+  padding: 1.1em 1em;
+  border: 1px solid var(--border-grey);
+  list-style: none;
+  li + li {
+    margin-top: 1em;
+  }
+  .inode:hover::after {
+    content: "\F1C5";
+    font-family: bootstrap-icons;
+    color: CanvasText;
+  }
+}
+
+button.inode-edit-acl {
+  &:hover {
+    color: CanvasText;
+  }
+  [class^="ico-"] {
+    font-size: 0.8em;
+  }
+}
+
+/* =====================
+  File Preview
+===================== */
+
+#file-preview-canvas {
+  display: flex;
+  min-height: 150px;
+  margin: 0 calc(-1 * var(--gutter));
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--border-grey-lite);
+  background: black;
+  color: white;
+  img,
+  video {
+    max-width: 100%;
+    max-height: 500px;
+  }
+  audio {
+    width: 500px;
+    max-width: 100%;
+    color-scheme: dark;
+  }
+  iframe {
+    width: 75em;
+    max-width: 100%;
+    height: 30em;
+    margin: 0;
+    padding: 0;
+    border: none;
+    &:not([data-proc="highlight"]) {
+      color-scheme: dark;
+    }
+    &[data-mime="application/pdf"] {
+      width: 840px;
+      height: 600px;
+    }
+  }
+  #font-sample {
+    display: flex;
+    min-height: 14rem;
+    margin: 0;
+    padding: 2em 0;
+    align-items: center;
+    font-family: FontSample;
+    font-size: 2rem;
+  }
+}
+
+#file-preview-loader {
+  margin: 0;
+  align-items: center;
+}
+
+/* =====================
+  ACL
+===================== */
+
+#acl-dialog {
+  .inode-name {
+    margin-top: -1em;
+    margin-bottom: 1.6em;
+    padding-bottom: 1.5em;
+    font-size: 1em;
+    font-weight: 300;
+    border-bottom: 2px solid var(--border-grey-lite);
+  }
+  input#pub-acl {
+    [data-browser-name="Chrome"] & {
+      position: relative;
+      top: 1px;
+    }
+  }
+  .permissions {
+    margin-top: 2.5em;
+    padding: 0.5em 1em 1em;
+    border: 1px solid var(--border-grey);
+    border-radius: 5px;
+    legend {
+      font-weight: 600;
+    }
+    label {
+      display: flex;
+      margin: 1em 0;
+      gap: 0.5em;
+    }
+    select {
+      text-transform: capitalize;
+    }
+    #acl-add-user {
+      margin-top: 1em;
+    }
+    #acl-loading {
+      display: flex;
+      gap: 0.5em;
+      justify-content: center;
+      color: var(--text-grey-strong);
+    }
+  }
+}
+
+.inode-access {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  button {
+    position: relative;
+    top: -1px;
+  }
+  .others-preview {
+    border-bottom: 1px dotted CanvasText;
+  }
+}
+
+/* =====================
+  Inodes Table
+===================== */
+
+#inodes-wrapper {
+  container-type: inline-size;
+  overflow: hidden;
+  border: 1px solid var(--border-grey);
+  border-radius: 5px;
+  body:not(:has(#chat-box)) &:has(.blank-slate) {
+    border-color: transparent;
+  }
+  .blank-slate {
+    margin: 3em 0;
+  }
+}
+
+.inodes-table {
+  --cell-gutter: 1em;
+  width: 100%;
+  margin: 0;
+  color: var(--text-grey-strong);
+  border-spacing: 0;
+  tbody {
+    position: relative;
+    z-index: 1;
+  }
+  td,
+  th {
+    padding: 1em;
+    vertical-align: top;
+  }
+  th {
+    padding: 0;
+    text-align: left;
+    font-weight: normal;
+    &.select,
+    &.size {
+      width: 1px;
+    }
+    &[aria-sort] {
+      font-weight: 500;
+      color: CanvasText;
+    }
+  }
+  td {
+    border-top: 1px solid var(--border-grey-lite);
+    &.name {
+      word-break: break-all;
+    }
+    &.size {
+      white-space: nowrap;
+      text-align: right;
+    }
+    &.date {
+      white-space: nowrap;
+      &::first-letter {
+        text-transform: uppercase;
+      }
+    }
+  }
+  tbody {
+    tr:has(.select input:checked) {
+      td {
+        color: CanvasText;
+        background: var(--bg-highlight);
+        border-top-color: transparent;
+      }
+      .select {
+        border-right-color: transparent;
+      }
+      + tr {
+        &:not(:has(.select input:checked)) td {
+          border-top-color: transparent;
+        }
+        &:has(.select input:checked) td {
+          @media (prefers-color-scheme: light) {
+            border-top-color: highlight;
+          }
+          @media (prefers-color-scheme: dark) {
+            border-top-color: Canvas;
+          }
+        }
+      }
+    }
+  }
+  button[data-sort] {
+    position: relative;
+    width: 100%;
+    margin: 0.5em 0;
+    padding-block: calc(var(--cell-gutter) - calc(var(--cell-gutter) / 2));
+    padding-left: var(--cell-gutter);
+    padding-right: calc(var(--cell-gutter) + 1.6em);
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    th:not(:last-of-type) & {
+      border-right: 1px solid var(--border-grey-lite);
+    }
+    &:hover {
+      color: CanvasText;
+    }
+    &:active {
+      color: var(--text-grey-strong);
+    }
+    &:is([aria-sort] &) {
+      &::after {
+        position: absolute;
+        right: var(--cell-gutter);
+        font-family: bootstrap-icons;
+        color: var(--text-grey);
+        -webkit-font-smoothing: antialiased;
+      }
+    }
+    &:is([aria-sort="ascending"] &)::after {
+      content: "\F286";
+    }
+    &:is([aria-sort="descending"] &)::after {
+      content: "\F282";
+      margin-top: 1px;
+    }
+  }
+  .select {
+    height: 0;
+    padding: 0;
+    border-right: 1px solid var(--border-grey-lite);
+    &:has(input):hover {
+      background: var(--bg-x-lite);
+    }
+    label {
+      display: inline-table;
+      height: 100%;
+      padding-inline: var(--cell-gutter);
+    }
+    input {
+      position: relative;
+      top: calc(var(--cell-gutter) + 4px);
+      margin: 0;
+      padding: 0;
+      vertical-align: top;
+      [data-browser-name="Safari"] & {
+        margin-top: 3px;
+      }
+    }
+  }
+  @container (width < 640px) {
+    th,
+    td {
+      &.kind {
+        display: none;
+      }
+    }
+  }
+}
+
+a.inode {
+  display: flex;
+  width: fit-content;
+  text-decoration: none;
+  gap: 0.7em;
+  span {
+    text-decoration: underline;
+  }
+  &::before {
+    width: 1em;
+    line-height: 1;
+    font-family: bootstrap-icons;
+    font-size: 1.4em;
+    -webkit-font-smoothing: antialiased;
+    color: #333;
+    @media (prefers-color-scheme: dark) {
+      color: CanvasText;
+    }
+  }
+  &.dir::before {
+    content: "\F3D1";
+  }
+  &.file::before {
+    content: "\F392";
+  }
+}
