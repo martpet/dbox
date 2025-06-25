@@ -1,0 +1,85 @@
+import { assert } from "@std/assert";
+import { env, isProd } from "../consts.ts";
+
+if (isProd) {
+  assert(env.AWS_ACCESS_KEY_ID_PROD);
+  assert(env.AWS_SECRET_ACCESS_KEY_PROD);
+  assert(env.AWS_CLOUDFRONT_KEYPAIR_ID_PROD);
+  assert(env.AWS_CLOUDFRONT_SIGNER_PRIVATE_KEY_PROD);
+  assert(env.AWS_MEDIACONVERT_ROLE_PROD);
+  assert(env.AWS_WEBHOOKS_KEY_PROD);
+  assert(env.AWS_PROC_SHARP_SQS_URL_PROD);
+  assert(env.AWS_PROC_LIBRE_SQS_URL_PROD);
+  assert(env.AWS_PROC_PANDOC_SQS_URL_PROD);
+  assert(env.AWS_PROC_CSV_SQS_URL_PROD);
+  assert(env.AWS_PROC_HIGHLIGHT_SQS_URL_PROD);
+  assert(env.AWS_ADMIN_EMAIL_ALERT_TOPIC_PROD);
+  assert(env.AWS_ADMIN_SMS_ALERT_TOPIC_PROD);
+} else {
+  assert(env.AWS_ACCESS_KEY_ID_DEV);
+  assert(env.AWS_SECRET_ACCESS_KEY_DEV);
+  assert(env.AWS_CLOUDFRONT_KEYPAIR_ID_DEV);
+  assert(env.AWS_CLOUDFRONT_SIGNER_PRIVATE_KEY_DEV);
+  assert(env.AWS_MEDIACONVERT_ROLE_DEV);
+  assert(env.AWS_WEBHOOKS_KEY_DEV);
+  assert(env.AWS_PROC_SHARP_SQS_URL_DEV);
+  assert(env.AWS_PROC_LIBRE_SQS_URL_DEV);
+  assert(env.AWS_PROC_PANDOC_SQS_URL_DEV);
+  assert(env.AWS_PROC_HIGHLIGHT_SQS_URL_DEV);
+  assert(env.AWS_PROC_CSV_SQS_URL_DEV);
+  assert(env.AWS_ADMIN_EMAIL_ALERT_TOPIC_DEV);
+  assert(env.AWS_ADMIN_SMS_ALERT_TOPIC_DEV);
+}
+
+export const AWS_REGION = "us-east-1";
+
+export const AWS_CREDENTIALS = {
+  accessKeyId: isProd ? env.AWS_ACCESS_KEY_ID_PROD : env.AWS_ACCESS_KEY_ID_DEV,
+  secretAccessKey: isProd
+    ? env.AWS_SECRET_ACCESS_KEY_PROD
+    : env.AWS_SECRET_ACCESS_KEY_DEV,
+};
+
+export const AWS_CLOUDFRONT_KEYPAIR_ID = isProd
+  ? env.AWS_CLOUDFRONT_KEYPAIR_ID_PROD
+  : env.AWS_CLOUDFRONT_KEYPAIR_ID_DEV;
+
+export const AWS_CLOUDFRONT_SIGNER_PRIVATE_KEY = isProd
+  ? env.AWS_CLOUDFRONT_SIGNER_PRIVATE_KEY_PROD
+  : env.AWS_CLOUDFRONT_SIGNER_PRIVATE_KEY_DEV;
+
+export const AWS_MEDIACONVERT_ROLE = isProd
+  ? env.AWS_MEDIACONVERT_ROLE_PROD
+  : env.AWS_MEDIACONVERT_ROLE_DEV;
+
+export const AWS_WEBHOOKS_KEY = isProd
+  ? env.AWS_WEBHOOKS_KEY_PROD
+  : env.AWS_WEBHOOKS_KEY_DEV;
+
+export const AWS_PROC_SHARP_SQS_URL = isProd
+  ? env.AWS_PROC_SHARP_SQS_URL_PROD
+  : env.AWS_PROC_SHARP_SQS_URL_DEV;
+
+export const AW_PROC_LIBRE_SQS_URL = isProd
+  ? env.AWS_PROC_LIBRE_SQS_URL_PROD
+  : env.AWS_PROC_LIBRE_SQS_URL_DEV;
+
+export const AWS_PROC_PANDOC_SQS_URL = isProd
+  ? env.AWS_PROC_PANDOC_SQS_URL_PROD
+  : env.AWS_PROC_PANDOC_SQS_URL_DEV;
+
+export const AWS_ADMIN_EMAIL_ALERT_TOPIC = isProd
+  ? env.AWS_ADMIN_EMAIL_ALERT_TOPIC_PROD
+  : env.AWS_ADMIN_EMAIL_ALERT_TOPIC_DEV;
+
+export const AWS_ADMIN_SMS_ALERT_TOPIC = isProd
+  ? env.AWS_ADMIN_SMS_ALERT_TOPIC_PROD
+  : env.AWS_ADMIN_SMS_ALERT_TOPIC_DEV;
+
+export const AWS_PROC_CSV_SQS_URL = isProd
+  ? env.AWS_PROC_CSV_SQS_URL_PROD
+  : env.AWS_PROC_CSV_SQS_URL_DEV;
+
+export const AWS_PROC_HIGHLIGHT_SQS_URL = isProd
+  ? env.AWS_PROC_HIGHLIGHT_SQS_URL_PROD
+  : env.AWS_PROC_HIGHLIGHT_SQS_URL_DEV;
