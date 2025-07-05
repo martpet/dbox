@@ -16,9 +16,9 @@ import {
 const rootEl = document.getElementById("chat");
 const chatBox = document.getElementById("chat-box");
 const chatSubEl = document.getElementById("chat-sub");
-const formNewMsg = document.getElementById("chat-msg-form");
+const formNewMsg = document.getElementById("chat-form");
 const textareaNewMsg = formNewMsg?.querySelector("textarea");
-
+const mainBoxReady = Promise.withResolvers();
 const {
   locale,
   chatId,
@@ -28,54 +28,7 @@ const {
   chatSubExpires,
 } = rootEl.dataset;
 
-applyChatBoxSize();
-lazyLoadMsgs();
-showIosChatSubHelp();
-insertMessageDialogs();
-syncSubscriber().then(syncChatSub);
-
-const mainBox = document.getElementById("chat-main");
-const chatTmpl = document.getElementById("chat-template");
-const dialogEditMsg = document.getElementById("edit-chat-msg-dialog");
-const dialogDelMsg = document.getElementById("cleanup-inode-msg-dialog");
-const textareaEditMsg = dialogEditMsg?.querySelector("textarea");
-const formEditMsg = dialogEditMsg?.querySelector("form");
-const btnEditMsgSubmit = dialogEditMsg?.querySelector("button.submit");
-const btnScrollToUnseen = document.getElementById("scrollto-unseen-msg-btn");
-const chatBeginning = document.getElementById("chat-beginning");
-const msgsLoader = document.getElementById("chat-msgs-loader");
-const usersTypingEl = document.querySelector("#chat-users-typing .names");
-const chatSubCheckbox = document.getElementById("chat-sub-checkbox");
-const chatSubDeniedTag = document.getElementById("chat-sub-denied");
-const chatSubHelp = document.getElementById("chat-sub-help");
-const btnAllowChatSub = document.getElementById("chat-sub-allow");
-
-const msgsBoxReady = Promise.withResolvers();
-const typingUsers = new Map();
-const listFmt = new Intl.ListFormat("en");
-const dateFmt = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
-const timeFmt = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
-const dateTimeFmt = new Intl.DateTimeFormat(locale, {
-  dateStyle: "long",
-  timeStyle: "short",
-});
-
-const chatSubProgressSignal = createSignal(false);
-const networkOnlineSignal = createSignal(navigator.onLine);
-const unseenChatMsgSignal = createSignal();
-const userActivitySignal = createSignal(new Date());
-
-const HIGH_FREQUENCY_EVENT_DELAY = 100;
-const USER_TYPING_SEND_INTERVAL = 5000;
-const GENERAL_CHAT_ERR_MSG = "The chat experienced an error";
-
-const socketUrl = new URL(location.origin);
-socketUrl.pathname = `/chat/connection/${chatId}`;
-socketUrl.protocol = location.protocol === "https:" ? "wss:" : "ws:";
-socketUrl.searchParams.set("title", chatTitle);
-socketUrl.searchParams.set("location", location.href);
-
-let msgsBox;
+let mainBox = document.getElementById("chat-main");
 let olderMsgsCursor;
 let lastSeenFeedItemId;
 let socket;
@@ -85,11 +38,50 @@ let currentUserTypingSession;
 let hasCurrentNotification;
 let isSubscriberOnlineDispatched;
 
-msgsBoxReady.promise.then(() => {
-  msgsBox = document.getElementById("chat-msgs");
-  ({ olderMsgsCursor, lastSeenFeedItemId } = msgsBox.dataset);
-  scrollToBottom(mainBox);
+applyChatBoxSize();
+lazyLoadHistory();
+showIosChatSubHelp();
+insertMessageDialogs();
+syncSubscriber().then(syncChatSub);
+
+const DATE_TIME_OPTIONS = { dateStyle: "long", timeStyle: "short" };
+const HIGH_FREQUENCY_EVENT_DELAY = 100;
+const USER_TYPING_SEND_INTERVAL = 5000;
+const GENERAL_CHAT_ERR_MSG = "The chat experienced an error";
+const chatTmpl = document.getElementById("chat-template");
+const dialogEditMsg = document.getElementById("edit-chat-msg-dialog");
+const dialogDelMsg = document.getElementById("cleanup-inode-msg-dialog");
+const textareaEditMsg = dialogEditMsg?.querySelector("textarea");
+const formEditMsg = dialogEditMsg?.querySelector("form");
+const btnEditMsgSubmit = dialogEditMsg?.querySelector("button.submit");
+const btnScrollToUnseen = document.getElementById("scrollto-unseen-msg-btn");
+const chatBeginning = document.getElementById("chat-beginning");
+const msgsLoader = document.getElementById("chat-feed-loader");
+const usersTypingEl = document.querySelector("#chat-users-typing .names");
+const chatSubCheckbox = document.getElementById("chat-sub-checkbox");
+const chatSubDeniedTag = document.getElementById("chat-sub-denied");
+const chatSubHelp = document.getElementById("chat-sub-help");
+const btnAllowChatSub = document.getElementById("chat-sub-allow");
+const dateTimeFmt = new Intl.DateTimeFormat(locale, DATE_TIME_OPTIONS);
+const chatSubProgressSignal = createSignal(false);
+const networkOnlineSignal = createSignal(navigator.onLine);
+const unseenChatMsgSignal = createSignal();
+const userActivitySignal = createSignal(new Date());
+const socketUrl = new URL(location.origin);
+const typingUsers = new Map();
+const listFmt = new Intl.ListFormat("en");
+const dateFmt = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
+const timeFmt = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
+
+socketUrl.pathname = `/chat/connection/${chatId}`;
+socketUrl.protocol = location.protocol === "https:" ? "wss:" : "ws:";
+socketUrl.searchParams.set("title", chatTitle);
+socketUrl.searchParams.set("location", location.href);
+
+mainBoxReady.promise.then(() => {
+  mainBox = document.getElementById("chat-main");
   connectSocket();
+  scrollToBottom(mainBox);
   prepareFormFields();
 });
 
@@ -128,9 +120,7 @@ addEventListener("beforeunload", () => {
 });
 
 function connectSocket() {
-  if (lastSeenFeedItemId) {
-    socketUrl.searchParams.set("lastSeenFeedItemId", lastSeenFeedItemId);
-  }
+  socketUrl.searchParams.set("lastSeenFeedItemId", lastSeenFeedItemId);
   socket = new WebSocket(socketUrl.href);
 
   socket.onopen = () => {
@@ -144,8 +134,8 @@ function connectSocket() {
 
   socket.onmessage = (event) => {
     try {
-      const chatEvent = JSON.parse(event.data);
-      handleInboundChatEvent(chatEvent);
+      const eventData = JSON.parse(event.data);
+      handleInboundChatEvent(eventData);
     } catch (err) {
       console.error(err);
       reloadWithAlert();
@@ -262,7 +252,7 @@ function handleInboundUserTyping({ username, lastUserMsgId }) {
  */
 function handleLoadOlderMsgsResp({ messages, nextCursor }) {
   olderMsgsCursor = nextCursor;
-  const firstMsg = msgsBox.querySelector(".chat-msg");
+  const firstMsg = mainBox.querySelector(".chat-msg");
   const firstMsgRectBefore = firstMsg.getBoundingClientRect();
   renderOlderMessagesLoaded(messages);
   if (!nextCursor) {
@@ -329,7 +319,7 @@ addEventListener("offline", () => (networkOnlineSignal.value = false));
  */
 addEventListener(
   "focus",
-  debouncedEvent(() => {
+  debounceEvent(() => {
     userActive();
     syncSubscriber();
   })
@@ -340,7 +330,7 @@ addEventListener(
  */
 addEventListener(
   "scroll",
-  debouncedEvent(() => {
+  debounceEvent(() => {
     userActive();
   }),
   { passive: true }
@@ -365,7 +355,7 @@ addEventListener("resize", () => {
  */
 mainBox.addEventListener(
   "scroll",
-  debouncedEvent(() => {
+  debounceEvent(() => {
     userActive();
   }),
   { passive: true }
@@ -399,12 +389,12 @@ btnAllowChatSub?.addEventListener("click", async () => {
 });
 
 /**
- * MsgsBox MouseOver
+ * MainBox MouseOver
  */
-msgsBoxReady.promise.then(() => {
-  msgsBox.addEventListener(
+mainBoxReady.promise.then(() => {
+  mainBox.addEventListener(
     "mouseover",
-    debouncedEvent((event) => {
+    debounceEvent((event) => {
       insertMsgMenuMaybe(event.target.closest(".chat-msg"));
     })
   );
@@ -413,8 +403,8 @@ msgsBoxReady.promise.then(() => {
 /**
  * MsgsBox Click
  */
-msgsBoxReady.promise.then(() => {
-  msgsBox.addEventListener("click", ({ target }) => {
+mainBoxReady.promise.then(() => {
+  mainBox.addEventListener("click", ({ target }) => {
     const isBtnShowDialog = target.classList.contains("show-msg-dialog-btn");
     if (isBtnShowDialog) showMsgDialog(target);
   });
@@ -502,7 +492,7 @@ textareaNewMsg?.addEventListener("input", async () => {
  */
 navigator.serviceWorker.addEventListener("message", async ({ data }) => {
   if (data.type === "chat-msg-notification-click") {
-    await msgsBoxReady.promise;
+    await mainBoxReady.promise;
     const msgEl = document.getElementById(data.chatMsgId);
     hasCurrentNotification = false;
     unseenChatMsgSignal.value = null;
@@ -574,7 +564,7 @@ function sanitizeChatMsgText(text) {
   return collapseLineBreaks(text, 2);
 }
 
-function debouncedEvent(fn) {
+function debounceEvent(fn) {
   return debounce(fn, HIGH_FREQUENCY_EVENT_DELAY);
 }
 
@@ -622,7 +612,7 @@ function msgIsInView(el) {
   );
 }
 
-function isFollowUpMsg({ username, createdAt, container = msgsBox }) {
+function isFollowUpMsg({ username, createdAt, container = mainBox }) {
   const lastEl = container.lastChild;
   if (!lastEl?.classList.contains("chat-msg")) return false;
   if (lastEl.dataset.username !== username) return false;
@@ -632,7 +622,7 @@ function isFollowUpMsg({ username, createdAt, container = msgsBox }) {
 }
 
 function findLastMsgByUser(username) {
-  return msgsBox.querySelector(
+  return mainBox.querySelector(
     `.chat-msg:nth-last-child(1 of [data-username="${username}"])`
   );
 }
@@ -717,22 +707,21 @@ async function dispatchSubscriberOnline({ skipChatSubUpdate } = {}) {
   }
 }
 
-async function lazyLoadMsgs() {
-  const lazyRootEl = document.getElementById("chat-lazy-root");
-  if (!lazyRootEl) {
-    msgsBoxReady.resolve();
-  } else {
-    const url = new URL(`/chat/lazy-load/${chatId}`, location.origin);
+async function lazyLoadHistory() {
+  const mount = document.getElementById("lazy-messages-mount");
+  if (mount) {
     const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
+    const url = new URL(`/chat/lazy-load/${chatId}`, location.origin);
     url.searchParams.set("tz", timeZone);
     const resp = await fetch(url.href);
-    if (!resp.ok) {
-      showChatError(GENERAL_CHAT_ERR_MSG);
+    if (resp.ok) {
+      mount.outerHTML = await resp.text();
     } else {
-      lazyRootEl.outerHTML = await resp.text();
-      msgsBoxReady.resolve();
+      showChatError(GENERAL_CHAT_ERR_MSG);
     }
   }
+
+  mainBoxReady.resolve();
 }
 
 // =====================
@@ -749,7 +738,7 @@ function renderOutboundNewMsg({ clientMsgId, text }) {
   });
   msgEl.classList.add("pending");
   appendDayElMaybe({ createdAt });
-  msgsBox.append(msgEl);
+  mainBox.append(msgEl);
   msgEl.scrollIntoView();
 }
 
@@ -769,7 +758,7 @@ function renderInboundNewMsg({ id, clientMsgId, username, text, createdAt }) {
     createdAt = new Date(createdAt);
     const newEl = buildMsgEl({ el, id, username, text, createdAt });
     appendDayElMaybe({ createdAt });
-    msgsBox.append(newEl);
+    mainBox.append(newEl);
   }
 }
 
@@ -834,12 +823,12 @@ function renderOlderMessagesLoaded(messages) {
     appendDayElMaybe({ createdAt, container });
     container.append(el);
   }
-  const msgsBoxFirstHeading = msgsBox.querySelector(".day");
+  const mainBoxHeading = mainBox.querySelector(".day");
   const containerLastHeading = container.querySelector(".day:last-of-type");
-  if (msgsBoxFirstHeading.textContent === containerLastHeading.textContent) {
-    msgsBoxFirstHeading.remove();
+  if (mainBoxHeading.textContent === containerLastHeading.textContent) {
+    mainBoxHeading.remove();
   }
-  msgsBox.prepend(container);
+  mainBox.prepend(container);
 }
 
 function renderUsersTyping(username, isTyping = true) {
@@ -911,7 +900,7 @@ function removeMsgEl(el) {
   el.remove();
 }
 
-function appendDayElMaybe({ createdAt, container = msgsBox }) {
+function appendDayElMaybe({ createdAt, container = mainBox }) {
   const prevDayHeading = container.querySelector(".day:last-of-type");
   const dateStr = dateFmt.format(createdAt);
   if (!prevDayHeading || prevDayHeading.textContent !== dateStr) {
@@ -941,7 +930,7 @@ function renderUnseenMsgSigns() {
   const msgEl = unseenChatMsgSignal.value;
   if (!msgEl) {
     btnScrollToUnseen.hidden = true;
-    const prevMsgEl = msgsBox.querySelector(".first-new-msg");
+    const prevMsgEl = mainBox.querySelector(".first-new-msg");
     prevMsgEl?.classList.remove("first-new-msg");
     newMsgSeen = false;
   } else if (newMsgSeen) {
@@ -1063,7 +1052,7 @@ function insertMessageDialogs() {
         <form method="dialog" class="basic">
           <footer>
             <button>Cancel</button>
-            <button autofocus class="submit">Yes, Delete</button>
+            <button class="submit">Yes, Delete</button>
           </footer>
         </form>
       </dialog>

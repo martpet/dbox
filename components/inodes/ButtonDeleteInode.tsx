@@ -41,7 +41,7 @@ export function DialogDeleteInode({ inode }: Props) {
           </span>
           <input
             type="text"
-            autofocus
+            // autofocus
             required
             pattern={espacdRegExp(inodeName)}
           />

@@ -27,7 +27,7 @@ export default function Flash(props: Props) {
       <form method="dialog">
         <i class={iconTypes[type]} />
         {children}
-        <button>X</button>
+        <button>OK</button>
       </form>
     </dialog>
   );

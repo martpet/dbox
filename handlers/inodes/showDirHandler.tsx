@@ -1,4 +1,3 @@
-import { getPermissions, parsePathname, segmentsToPathname } from "$util";
 import ChatBox from "../../components/chat/ChatBox.tsx";
 import ButtonBulkActions from "../../components/inodes/ButtonBulkActions.tsx";
 import ButtonCreateDir from "../../components/inodes/ButtonCreateDir.tsx";
@@ -10,13 +9,17 @@ import InodesTable, {
 } from "../../components/inodes/InodesTable.tsx";
 import PageNotFound from "../../components/pages/error/PageNotFound.tsx";
 import Page from "../../components/pages/Page.tsx";
+import { getPermissions } from "../../modules/util/file_permissions.ts";
+import {
+  parsePathname,
+  segmentsToPathname,
+} from "../../modules/util/pathname.ts";
 import { asset } from "../../util/asset.ts";
 import { getDirByPath, listInodesByDir } from "../../util/kv/inodes.ts";
 import type { Context } from "../../util/types.ts";
 import { TOGGLE_CHAT } from "../chat/toggle_chat.ts";
 import { FROM_DELETE } from "./delete.ts";
-
-export const PARTIAL_INODES = "inodes";
+import { PARTIAL_INODES } from "./show_dir.tsx";
 
 export default async function showDirHandler(ctx: Context) {
   const { user } = ctx.state;

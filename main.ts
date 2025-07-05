@@ -26,7 +26,7 @@ import setDirByPath from "./handlers/inodes/create_dir.ts";
 import deleteInodes from "./handlers/inodes/delete.ts";
 import getFile from "./handlers/inodes/get_file.ts";
 import listenPostProcessing from "./handlers/inodes/listen_post_proc.ts";
-import showDir from "./handlers/inodes/show_dir.tsx";
+import showDir from "./handlers/inodes/showDirHandler.tsx";
 import showFile from "./handlers/inodes/show_file.tsx";
 import completeUpload from "./handlers/inodes/upload/complete.ts";
 import initiateUpload from "./handlers/inodes/upload/initiate.ts";

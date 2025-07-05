@@ -1,4 +1,4 @@
-#chat-lazy-root {
+#lazy-messages-mount {
   flex-grow: 1;
   display: flex;
   justify-content: center;
@@ -34,8 +34,8 @@
   flex-direction: column;
   overflow: auto;
   resize: both;
-  width: 26rem;
-  height: 21.5rem;
+  width: 435px;
+  height: 355px;
   min-height: 5rem;
   min-width: 10rem;
   max-width: 100%;
@@ -62,7 +62,7 @@
   }
 }
 
-#chat-msgs-loader {
+#chat-feed-loader {
   align-self: center;
   display: flex;
   align-items: center;
@@ -82,7 +82,7 @@
   color: var(--text-grey);
 }
 
-#chat-msgs {
+#chat-main {
   h3.day {
     display: flex;
     margin: 1rem 0 0;
@@ -188,14 +188,14 @@
   }
 }
 
-#chat-footer {
+#chat-form-wrapper {
   position: relative;
   display: flex;
   max-height: calc(100% - 4rem);
   margin: 0 0.5rem;
 }
 
-#chat-msg-form {
+#chat-form {
   flex-grow: 1;
   display: flex;
   margin-bottom: 0.5rem;

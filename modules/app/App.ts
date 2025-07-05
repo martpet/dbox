@@ -258,16 +258,16 @@ export class App {
 
   static redirectBack(
     ctx: AppContext,
-    ...[opt = {}]: Parameters<ContextFnRedirectBack>
+    ...[
+      {
+        searchParams = {},
+        fragment = "",
+      } = {},
+    ]: Parameters<ContextFnRedirectBack>
   ) {
-    let pathname = ctx.req.headers.get(HEADER.Referer) || ctx.url.origin;
-    if (opt.urlParams) {
-      const url = new URL(pathname);
-      for (const [key, val] of Object.entries(opt.urlParams)) {
-        url.searchParams.set(key, val);
-      }
-      pathname = url.href;
-    }
-    return ctx.redirect(pathname);
+    const url = new URL(ctx.req.headers.get(HEADER.Referer) || ctx.url.origin);
+    for (const it of Object.entries(searchParams)) url.searchParams.set(...it);
+    url.hash = fragment;
+    return ctx.redirect(url.href);
   }
 }

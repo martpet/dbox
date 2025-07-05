@@ -6,8 +6,8 @@ import {
 } from "$util";
 import { format as formatBytes } from "@std/fmt/bytes";
 import { STATUS_CODE } from "@std/http";
-import ChatSection from "../../components/chat/ChatSection.tsx";
-import ButtonPageSettings from "../../components/inodes/ButtonPageSettings.tsx";
+import ChatBox from "../../components/chat/ChatBox.tsx";
+import ButtoeInodeSettings from "../../components/inodes/ButtonInodeSettings.tsx";
 import InodeHeader from "../../components/inodes/InodeHeader.tsx";
 import FilePreview from "../../components/inodes/preview/FilePreview.tsx";
 import PageNotFound from "../../components/pages/error/PageNotFound.tsx";
@@ -16,19 +16,19 @@ import { asset } from "../../util/asset.ts";
 import { getFilePreviewDetails } from "../../util/inodes/file_preview.ts";
 import { getDirByPath, getInodeByDir } from "../../util/kv/inodes.ts";
 import type { Context } from "../../util/types.ts";
-import { FROM_TOGGLE_CHAT } from "../chat/toggle_chat.ts";
+import { TOGGLE_CHAT } from "../chat/toggle_chat.ts";
 
 export default async function showFileHandler(ctx: Context) {
   const { user } = ctx.state;
   const path = parsePathname(ctx.url.pathname) as NonRootPath;
-  const from = ctx.url.searchParams.get("from");
+  const chatWasToggled = ctx.url.searchParams.get("from") === TOGGLE_CHAT;
 
   if (path.isRootSegment) {
     return ctx.redirect(ctx.req.url + "/", STATUS_CODE.PermanentRedirect);
   }
 
   const { value: dirNode } = await getDirByPath(path.parentSegments, {
-    consistency: from === FROM_TOGGLE_CHAT ? "strong" : "eventual",
+    consistency: chatWasToggled ? "strong" : "eventual",
   });
 
   if (!dirNode) {
@@ -79,7 +79,7 @@ export default async function showFileHandler(ctx: Context) {
   const menuItems = (
     <>
       {(perm.canModerate || perm.canModify) && (
-        <ButtonPageSettings inode={inode} perm={perm} showDelete />
+        <ButtoeInodeSettings inode={inode} perm={perm} showDelete />
       )}
     </>
   );
@@ -103,14 +103,15 @@ export default async function showFileHandler(ctx: Context) {
       <InodeHeader menuItems={menuItems}>
         <h1 hidden>{fileName}</h1>
         <p>
-          <a href={`/download/${inode.id}`}>Download</a>{" "}
-          ({formatBytes(inode.fileSize)})
+          <a href={`/download/${inode.id}`} title={formatBytes(inode.fileSize)}>
+            Download
+          </a>
         </p>
       </InodeHeader>
 
-      <ChatSection
+      <ChatBox
         enabled={inode.chatEnabled}
-        chatId={inode.id}
+        inodeId={inode.id}
         chatTitle={inode.name}
         perm={perm}
       />

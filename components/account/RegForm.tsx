@@ -20,7 +20,7 @@ export default function RegForm(_props: unknown, ctx: Context) {
               id="reg-form-username"
               type="text"
               required
-              autofocus
+              // autofocus
               autocomplete="off"
               autocapitalize="off"
               spellcheck={false}

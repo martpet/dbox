@@ -718,3 +718,6 @@ pre.basic {
 .ico-exclamation-triangle::before {
   content: "\F33B";
 }
+.ico-play-fill::before {
+  content: "\F4F4";
+}

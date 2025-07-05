@@ -109,7 +109,7 @@ function insertDialog() {
             <strong>This action cannot be undone.</strong>
           </p>
           <label>
-            <span>Please type your username to continue:</span>
+            <span>Please type your username to confirm:</span>
             <input type="text" id="delete-account-confirm" required autofocus pattern="${userUsername}"/>
           </label>
           <footer>

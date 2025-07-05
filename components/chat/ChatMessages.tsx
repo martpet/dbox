@@ -26,7 +26,7 @@ export default function ChatMessages(props: Props, ctx: Context) {
   return (
     <>
       {olderMsgsCursor && (
-        <p id="chat-msgs-loader" class="spinner-sm">
+        <p id="chat-feed-loader" class="spinner-sm">
           Loading older messages
         </p>
       )}
@@ -35,9 +35,9 @@ export default function ChatMessages(props: Props, ctx: Context) {
         <em>This is the beginning of the conversation.</em>
       </p>
 
-      <div
-        id="chat-msgs"
+      <article
         role="log"
+        id="chat-feed"
         data-older-msgs-cursor={olderMsgsCursor}
         data-last-seen-feed-item-id={messages.at(-1)?.feedItemId}
       >
@@ -55,7 +55,7 @@ export default function ChatMessages(props: Props, ctx: Context) {
             ))}
           </>
         ))}
-      </div>
+      </article>
     </>
   );
 }

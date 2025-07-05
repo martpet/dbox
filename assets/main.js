@@ -347,7 +347,7 @@ export function flashNow(flash) {
       <form method="dialog">
         <i class="${iconTypes[flashType]}"></i>
         ${flash.msg}
-        <button>X</button>
+        <button>OK</button>
       </form>
     </dialog>
   `;

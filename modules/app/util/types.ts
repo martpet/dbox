@@ -104,7 +104,8 @@ interface ContextFnSseOptions {
 }
 
 interface ContextFnRedirectBackOptions {
-  urlParams?: Record<string, string>;
+  searchParams?: Record<string, string>;
+  fragment?: string;
 }
 
 interface ContextFnSseOnStartOptions {

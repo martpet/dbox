@@ -7,7 +7,7 @@ import { getInodeById } from "../../util/kv/inodes.ts";
 import { kv } from "../../util/kv/kv.ts";
 import type { Context } from "../../util/types.ts";
 
-export const FROM_TOGGLE_CHAT = "toggle_chat";
+export const TOGGLE_CHAT = "toggle_chat";
 
 export default async function toggleChatHandler(ctx: Context) {
   const { user } = ctx.state;
@@ -36,6 +36,7 @@ export default async function toggleChatHandler(ctx: Context) {
   }
 
   inode.chatEnabled = !inode.chatEnabled;
+  const { chatEnabled } = inode;
 
   const atomic = kv.atomic();
   atomic.check(inodeEntry);
@@ -43,14 +44,17 @@ export default async function toggleChatHandler(ctx: Context) {
   const commit = await atomic.commit();
 
   if (commit.ok) {
-    if (inode.chatEnabled) {
-      ctx.setFlash("Chat enabled");
+    if (chatEnabled) {
+      ctx.setFlash("Chat started");
     } else {
-      ctx.setFlash({ type: "info", msg: "Chat disabled" });
+      ctx.setFlash({ type: "info", msg: "Chat stopped" });
     }
   } else {
     ctx.setFlash({ type: "error", msg: GENERAL_ERR_MSG });
   }
 
-  return ctx.redirectBack({ urlParams: { from: FROM_TOGGLE_CHAT } });
+  return ctx.redirectBack({
+    searchParams: { from: TOGGLE_CHAT },
+    fragment: commit.ok && chatEnabled ? "chat" : undefined,
+  });
 }

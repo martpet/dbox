@@ -13,10 +13,10 @@ export default function ChatSubscription(_props: unknown, ctx: Context) {
     os.name === "Android" && browser.name === "Chrome"
   ) {
     help =
-      "You'll get chat notifications when this page is closed or in the background.";
+      "You'll get push notifications when this page is closed or in the background.";
   } else {
     help =
-      `You'll get chat notifications when this page is closed or unfocused, as long as ${browser.name} is running.`;
+      `You'll get push notifications when this page is closed or unfocused, as long as ${browser.name} is running.`;
   }
 
   return (

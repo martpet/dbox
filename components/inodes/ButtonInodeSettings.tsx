@@ -10,14 +10,18 @@ interface Props {
   showDelete?: boolean;
 }
 
-export default function ButtonPageSettings({ inode, perm, showDelete }: Props) {
+export default function ButtoeInodeSettings(
+  { inode, perm, showDelete }: Props,
+) {
   return (
     <>
       <PopMenu
         btnContent={<i class="ico-gear" />}
         menuId="inode-page-settings"
       >
-        {perm.canModerate && <ButtonToggleChat inode={inode} />}
+        {perm.canModerate && (
+          <ButtonToggleChat inodeId={inode.id} isEnabled={inode.chatEnabled} />
+        )}
         {showDelete && perm.canModify && <ButtonDeleteInode inode={inode} />}
       </PopMenu>
       {showDelete && <DialogDeleteInode inode={inode} />}

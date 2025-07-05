@@ -5,7 +5,7 @@ import { CHAT_SUB_WITHOUT_PUSH_SUB_EXPIRES } from "../../util/consts.ts";
 import type { Context } from "../../util/types.ts";
 import LoaderDots from "../loaders/LoaderDots.tsx";
 import ChatDayHeading from "./ChatDayHeading.tsx";
-import ChatFooter from "./ChatFooter.tsx";
+import ChatForm from "./ChatForm.tsx";
 import ChatMessages, { chatIntlFmt } from "./ChatMessages.tsx";
 import ChatMsg from "./ChatMsg.tsx";
 import ChatMsgEditTag from "./ChatMsgEditTag.tsx";
@@ -13,7 +13,7 @@ import ChatSubscription from "./ChatSubscription.tsx";
 
 type Props = (PropsWithLazyLoad | PropsWithoutLazyLoad) & {
   enabled: boolean | undefined;
-  chatId: string;
+  inodeId: string;
   chatTitle: string;
   perm: ResourcePermissions;
 };
@@ -28,16 +28,14 @@ interface PropsWithoutLazyLoad {
   olderMsgsCursor: string | null;
 }
 
-export default function ChatSection(props: Props, ctx: Context) {
-  const {
-    chatId,
-    enabled,
-    chatTitle,
-    perm,
-    messages,
-    olderMsgsCursor,
-  } = props;
-
+export default function ChatBox({
+  enabled,
+  perm,
+  messages,
+  olderMsgsCursor,
+  inodeId,
+  chatTitle,
+}: Props, ctx: Context) {
   if (!enabled) {
     return <div id="chat" hidden />;
   }
@@ -49,7 +47,7 @@ export default function ChatSection(props: Props, ctx: Context) {
   return (
     <section
       id="chat"
-      data-chat-id={chatId}
+      data-chat-id={inodeId}
       data-chat-title={chatTitle}
       data-can-moderate={canModerate ? "1" : null}
       data-msg-followup-duration={CHAT_MSG_FOLLOWUP_DURATION}
@@ -64,22 +62,21 @@ export default function ChatSection(props: Props, ctx: Context) {
 
       <div id="chat-box">
         <div id="chat-main">
-          {messages
-            ? (
-              <ChatMessages
-                messages={messages}
-                olderMsgsCursor={olderMsgsCursor}
-                canModerate={canModerate}
-              />
-            )
-            : <div id="chat-lazy-root" class="spinner-lg" />}
+          {messages && (
+            <ChatMessages
+              messages={messages}
+              olderMsgsCursor={olderMsgsCursor}
+              canModerate={canModerate}
+            />
+          )}
+          {!messages && <output id="lazy-messages-mount" class="spinner-lg" />}
         </div>
-        <ChatFooter />
+        <ChatForm />
       </div>
 
-      <p id="chat-users-typing" aria-live="polite">
+      <aside id="chat-users-typing" aria-live="polite">
         <span class="names"></span> <LoaderDots />
-      </p>
+      </aside>
 
       {ctx.state.canUseServiceWorker && <ChatSubscription />}
 

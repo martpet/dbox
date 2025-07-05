@@ -45,7 +45,7 @@ main {
 /* fallback for popover "position-try-fallbacks" */
 html:not([data-browser-name="Chrome"]) {
   #inode-page-settings {
-    margin-left: -80px;
+    margin-left: -60px;
   }
 }
 

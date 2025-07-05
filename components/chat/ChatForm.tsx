@@ -1,14 +1,13 @@
 import { CHAT_MESSAGE_CONTRAINTS } from "$chat";
 import type { Context } from "../../util/types.ts";
 
-export default function ChatFooter(_props: unknown, ctx: Context) {
-  const { user } = ctx.state;
-  const { userAgent } = ctx;
+export default function ChatForm(_props: unknown, ctx: Context) {
+  const { state, userAgent } = ctx;
 
   return (
-    <div id="chat-footer">
-      {user && (
-        <form id="chat-msg-form">
+    <div id="chat-form-wrapper">
+      {state.user && (
+        <form id="chat-form">
           <fieldset disabled>
             <textarea
               rows={1}

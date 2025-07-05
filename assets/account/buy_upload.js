@@ -335,7 +335,7 @@ function insertDialog() {
         <div id="stripe-root"></div>
         <form class="basic">
           <footer>
-            <button id="buy-traffic-close" type="button" autofocus>Cancel</button>
+            <button id="buy-traffic-close" type="button">Cancel</button>
           </footer>
         </form>
       </dialog>
